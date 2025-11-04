@@ -1,1 +1,3 @@
-This is the official studysphere repo BMSCE
+This is the official studysphere BMSCE repo
+
+I have built the entire frontend
