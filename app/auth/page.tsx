@@ -6,7 +6,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Sparkles, Chrome, ArrowLeft, Eye, EyeOff } from "lucide-react"
+import { BrainCircuit,Sparkles, Chrome, ArrowLeft, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 
 export default function AuthPage() {
@@ -32,11 +32,11 @@ export default function AuthPage() {
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8"
           >
             <ArrowLeft size={18} />
-            Back to landing
+            Back to Home
           </Link>
           <div className="flex justify-center mb-4">
             <div className="p-3 rounded-full bg-primary/10">
-              <Sparkles className="text-primary" size={28} />
+              <BrainCircuit className="text-primary" size={28} />
             </div>
           </div>
           <h1 className="text-3xl font-bold tracking-tight">{isLogin ? "Welcome Back" : "Join StudySphere"}</h1>

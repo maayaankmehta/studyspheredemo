@@ -50,7 +50,7 @@ export default function CreateStudyGroupDialog({ open, onOpenChange }: CreateStu
             <Input
               id="name"
               name="name"
-              placeholder="e.g., Advanced Algorithms Masters"
+              placeholder="e.g., Full Stack"
               value={formData.name}
               onChange={handleChange}
               className="mt-1 bg-secondary/50 border-border"
@@ -65,7 +65,7 @@ export default function CreateStudyGroupDialog({ open, onOpenChange }: CreateStu
             <Input
               id="subject"
               name="subject"
-              placeholder="e.g., CS201"
+              placeholder="e.g., 23CS3AEFWD"
               value={formData.subject}
               onChange={handleChange}
               className="mt-1 bg-secondary/50 border-border"

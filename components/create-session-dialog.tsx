@@ -75,9 +75,9 @@ export default function CreateSessionDialog({ open, onOpenChange }: CreateSessio
                 <SelectValue placeholder="Choose a Group" />
               </SelectTrigger>
               <SelectContent className="glass-card">
-                <SelectItem value="m3-masters">M3 Masters</SelectItem>
-                <SelectItem value="code-ninjas">Code Ninjas</SelectItem>
-                <SelectItem value="math-wizards">Math Wizards</SelectItem>
+                <SelectItem value="Full Stack Web">Full Stack Web</SelectItem>
+                <SelectItem value="Java Programming">Java Programming</SelectItem>
+                <SelectItem value="StudySphere">StudySphere</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -8,35 +8,35 @@ const mockUpcomingSessions = [
   {
     id: "1",
     courseCode: "22CS3AEFWD",
-    title: "Advanced Algorithms: Final Exam Review",
-    date: "Oct 28",
-    time: "4:00 PM - 6:00 PM",
-    location: "Library, Room 301",
-    attendees: 5,
-    hostName: "Alex Johnson",
-    groupName: "M3 Masters",
+    title: "Full Stack Web Development",
+    date: "Oct 22",
+    time: "8:00 AM - 10:00 AM",
+    location: "CSE-UG LAB2",
+    attendees: 4,
+    hostName: "RazanCodes",
+    groupName: "Team StudySphere",
   },
   {
     id: "2",
-    courseCode: "MTH201",
-    title: "Calculus Study Group",
-    date: "Oct 29",
-    time: "6:00 PM - 8:00 PM",
-    location: "Discord Link",
+    courseCode: "23MA3BSSDM",
+    title: "Probability Practice",
+    date: "Oct 23",
+    time: "1:00 PM - 2:00 PM",
+    location: "Reference Section, 1st Floor PJA Block",
     attendees: 8,
-    hostName: "Sam Lee",
-    groupName: "Math Wizards",
+    hostName: "Talib Khan",
+    groupName: "SDM Group",
   },
   {
     id: "3",
-    courseCode: "CS101",
-    title: "Web Development Workshop",
-    date: "Oct 30",
+    courseCode: "23CS3PCOOJ ",
+    title: "Java Coding Session (cie-1)",
+    date: "Oct 25",
     time: "3:00 PM - 5:00 PM",
-    location: "Tech Hub, Room 102",
+    location: "CSE Dept, Room 102",
     attendees: 12,
-    hostName: "Jordan Chen",
-    groupName: "Code Ninjas",
+    hostName: "RazanCodes",
+    groupName: "Backend Fans",
   },
 ]
 
@@ -45,7 +45,7 @@ export default function DashboardPage() {
     <AppLayout>
       <div className="max-w-5xl leading-3">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">My Upcoming Sessions</h1>
+          <h1 className="text-3xl font-bold tracking-tight">My Upcoming Study Sessions</h1>
           <p className="text-muted-foreground text-sm mt-1">Your study schedule for the week ahead</p>
         </div>
 

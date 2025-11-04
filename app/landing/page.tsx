@@ -10,57 +10,46 @@ const mockPopularSessions = [
   {
     id: "1",
     courseCode: "22CS3AEFWD",
-    title: "Advanced Algorithms: Final Exam Review",
-    date: "Oct 28",
-    time: "4:00 PM - 6:00 PM",
-    location: "Library, Room 301",
-    attendees: 5,
-    hostName: "Alex Johnson",
-    groupName: "M3 Masters",
+    title: "Full Stack Web Development",
+    date: "Oct 22",
+    time: "8:00 AM - 10:00 AM",
+    location: "CSE-UG LAB2",
+    attendees: 4,
+    hostName: "RazanCodes",
+    groupName: "Team StudySphere",
   },
   {
     id: "2",
-    courseCode: "MTH201",
-    title: "Calculus Study Group",
-    date: "Oct 29",
-    time: "6:00 PM - 8:00 PM",
-    location: "Discord Link",
+    courseCode: "23MA3BSSDM",
+    title: "Probability Practice",
+    date: "Oct 23",
+    time: "1:00 PM - 2:00 PM",
+    location: "Reference Section, 1st Floor PJA Block",
     attendees: 8,
-    hostName: "Sam Lee",
-    groupName: "Math Wizards",
+    hostName: "Talib Khan",
+    groupName: "SDM Group",
   },
   {
     id: "3",
-    courseCode: "CS101",
-    title: "Web Development Workshop",
-    date: "Oct 30",
+    courseCode: "23CS3PCOOJ ",
+    title: "Java Coding Session (cie-1)",
+    date: "Oct 25",
     time: "3:00 PM - 5:00 PM",
-    location: "Tech Hub, Room 102",
+    location: "CSE Dept, Room 102",
     attendees: 12,
-    hostName: "Jordan Chen",
-    groupName: "Code Ninjas",
+    hostName: "RazanCodes",
+    groupName: "Backend Fans",
   },
   {
     id: "4",
-    courseCode: "PHY301",
-    title: "Physics Problem Solving",
+    courseCode: "23CS3PCDST",
+    title: "Data Structures",
     date: "Oct 31",
     time: "5:00 PM - 7:00 PM",
-    location: "Science Center, Lab A",
-    attendees: 6,
-    hostName: "Emma Wilson",
-    groupName: "Physics Pros",
-  },
-  {
-    id: "5",
-    courseCode: "ENG201",
-    title: "Literature Discussion Circle",
-    date: "Nov 1",
-    time: "7:00 PM - 9:00 PM",
-    location: "Café Study Lounge",
-    attendees: 9,
-    hostName: "Oliver Brown",
-    groupName: "Book Lovers",
+    location: "cse DEPT, DS LAB",
+    attendees: 15,
+    hostName: "Muzammil Zahoor",
+    groupName: "DSA FANS",
   },
 ]
 
@@ -111,12 +100,12 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <div className="flex justify-center mb-4">
             <div className="p-3 rounded-full bg-primary/10">
-              <Sparkles className="text-primary" size={32} />
+              <Rocket className="text-primary" size={32} />
             </div>
           </div>
           <div className="space-y-6">
             <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-foreground">
-              The Best Study Platform there is
+              WHERE BMSCE STUDYS - StudySphere
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               Connect with peers, join collaborative study sessions, and accelerate your learning journey with

@@ -11,11 +11,11 @@ import CreateStudyGroupDialog from "@/components/create-study-group-dialog"
 const mockStudyGroups = [
   {
     id: "1",
-    name: "Advanced Algorithms Masters",
-    subject: "CS201",
-    description: "Deep dive into algorithm design, complexity analysis, and advanced data structures.",
+    name: "Team StudySphere",
+    subject: "22CS3AEFWD",
+    description: "Deep dive into React JS, FASTAPI and Django.",
     members: 24,
-    createdBy: "Alex Johnson",
+    createdBy: "RazanCodes",
     memberImages: [
       "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
       "https://api.dicebear.com/7.x/avataaars/svg?seed=Sam",
@@ -24,11 +24,11 @@ const mockStudyGroups = [
   },
   {
     id: "2",
-    name: "Calculus Study Group",
-    subject: "MTH201",
-    description: "Collaborative learning space for calculus concepts, problem-solving, and exam prep.",
+    name: "Statistics and Discrete Maths",
+    subject: "23MA3BSSDM",
+    description: "Collaborative learning space for probability and stats concepts, problem-solving, and exam prep.",
     members: 18,
-    createdBy: "Sam Lee",
+    createdBy: "Talib Khan",
     memberImages: [
       "https://api.dicebear.com/7.x/avataaars/svg?seed=Sam",
       "https://api.dicebear.com/7.x/avataaars/svg?seed=Emma",
@@ -37,11 +37,11 @@ const mockStudyGroups = [
   },
   {
     id: "3",
-    name: "Web Development Ninjas",
-    subject: "WEB301",
-    description: "Master modern web development with React, Node.js, and full-stack projects.",
+    name: "Java Coding Club",
+    subject: "23CS3PCOOJ",
+    description: "Led by Faculty Monisha H M for learining developing Java Applications",
     members: 32,
-    createdBy: "Jordan Chen",
+    createdBy: "Monisha H M",
     memberImages: [
       "https://api.dicebear.com/7.x/avataaars/svg?seed=Jordan",
       "https://api.dicebear.com/7.x/avataaars/svg?seed=Sofia",
@@ -50,11 +50,11 @@ const mockStudyGroups = [
   },
   {
     id: "4",
-    name: "Physics Enthusiasts",
-    subject: "PHY301",
-    description: "Explore quantum mechanics, thermodynamics, and classical physics theories together.",
+    name: "Data Structures",
+    subject: "23CS3PCDST",
+    description: "Explore Data Structures, and How they work together.",
     members: 15,
-    createdBy: "Emma Davis",
+    createdBy: "Muzammil Zahoor",
     memberImages: [
       "https://api.dicebear.com/7.x/avataaars/svg?seed=Emma",
       "https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus",
@@ -63,11 +63,11 @@ const mockStudyGroups = [
   },
   {
     id: "5",
-    name: "Machine Learning Labs",
-    subject: "ML401",
+    name: "Machine Learning gang",
+    subject: "23CS6PCMAL",
     description: "Advanced machine learning techniques, neural networks, and AI project discussions.",
     members: 28,
-    createdBy: "Marcus Brown",
+    createdBy: "Mayank",
     memberImages: [
       "https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus",
       "https://api.dicebear.com/7.x/avataaars/svg?seed=Sofia",

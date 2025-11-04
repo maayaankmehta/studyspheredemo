@@ -11,15 +11,15 @@ import AppLayout from "@/components/app-layout"
 const mockSession = {
   id: "1",
   courseCode: "22CS3AEFWD",
-  title: "Advanced Algorithms: Final Exam Review",
-  date: "Tuesday, October 28th",
-  time: "4:00 PM - 6:00 PM",
-  location: "Library, Room 301",
+  title: "Full Stack Web Development",
+  date: "Wednesday, October 22nd",
+  time: "8:00 am - 10:00 am",
+  location: "CSE-UG LAB2",
   description:
-    "Join us for an in-depth review of advanced algorithms covered in this semester. We'll go through sorting algorithms, dynamic programming, graph algorithms, and more. This is a great opportunity to clarify any concepts before the final exam. Bring your questions and your laptop!",
-  hostName: "Alex Johnson",
-  hostImage: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
-  groupName: "M3 Masters",
+    "Join us for an in-depth study of FWD covered in this semester. We'll go through React for frontend, Django for backend, FASTAPI for connecting API, and more. This is a great opportunity to develop web application from front to back. Bring your questions and your laptop!",
+  hostName: "Razancodes",
+  hostImage: "https://api.dicebear.com/9.x/avataaars/svg?top=frizzle",
+  groupName: "Team StudySphere",
   attendees: [
     { name: "Sam Lee", image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sam" },
     { name: "Jordan Chen", image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jordan" },

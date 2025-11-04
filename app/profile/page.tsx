@@ -7,11 +7,11 @@ import { Progress } from "@/components/ui/progress"
 import AppLayout from "@/components/app-layout"
 
 const userProfile = {
-  name: "Alex Johnson",
+  name: "Muhammed Razan",
   level: "Level 4: Senior",
   currentXP: 1250,
   nextLevelXP: 2000,
-  image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
+  image: "https://api.dicebear.com/9.x/avataaars/svg?seed=Henry",
 }
 
 const badges = [
@@ -24,10 +24,10 @@ const badges = [
 ]
 
 const groups = [
-  { name: "M3 Masters", membersCount: 24 },
-  { name: "Code Ninjas", membersCount: 31 },
-  { name: "Math Wizards", membersCount: 18 },
-  { name: "Science Squad", membersCount: 42 },
+  { name: "StudySphere", membersCount: 24 },
+  { name: "Java Coding Club", membersCount: 31 },
+  { name: "Machine learning gang", membersCount: 18 },
+  { name: "Full Stack web", membersCount: 42 },
 ]
 
 export default function ProfilePage() {

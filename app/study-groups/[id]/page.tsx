@@ -11,13 +11,13 @@ import AppLayout from "@/components/app-layout"
 const mockGroups: Record<string, any> = {
   "1": {
     id: "1",
-    name: "Advanced Algorithms Masters",
-    subject: "CS201",
-    description: "Deep dive into algorithm design, complexity analysis, and advanced data structures.",
+    name: "Full Stack Web Development",
+    subject: "22CS3AEFWD",
+    description: "All about Full stack web development.",
     fullDescription:
-      "Welcome to the Advanced Algorithms Masters study group! This is a dedicated space for students passionate about mastering algorithm design and complexity analysis. We cover topics including sorting algorithms, dynamic programming, graph algorithms, and more. Whether you're preparing for technical interviews or just want to deepen your algorithmic knowledge, this group is for you.",
-    createdBy: "Alex Johnson",
-    createdByImage: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
+      "Welcome to the Full stack web development study group! This is a dedicated space for students passionate about mastering FWD. We cover topics including Frontend, Building APIs and more. Whether you're making a project or just want to deepen your domain knowledge, this group is for you.",
+    createdBy: "RazanCodes",
+    createdByImage: "https://api.dicebear.com/9.x/avataaars/svg?top=frizzle",
     members: 24,
     chatLink: "https://discord.gg/algorithms",
     memberList: [
@@ -118,7 +118,7 @@ export default function StudyGroupDetailPage() {
 
               {/* Members */}
               <div>
-                <p className="text-sm font-semibold mb-3">Members ({group.memberList.length})</p>
+                <p className="text-sm font-semibold mb-3">Members ({group.members})</p>
                 <div className="flex -space-x-2 mb-3">
                   {group.memberList.map((member: any, idx: number) => (
                     <Avatar key={idx} className="h-10 w-10 border-2 border-card">
