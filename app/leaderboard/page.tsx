@@ -78,7 +78,7 @@ const leaderboardData = {
       rank: 1,
       name: "Muhammed Razan",
       xp: 4200,
-      image: "https://api.dicebear.com/9.x/avataaars/svg?seed=Henry",
+      image: "https://api.dicebear.com/9.x/avataaars/svg?seed=Henry  ",
       badge: "Rising Star",
     },
     {

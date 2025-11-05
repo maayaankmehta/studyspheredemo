@@ -5,6 +5,9 @@ import { Card } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
 import AppLayout from "@/components/app-layout"
+import Link from "next/link"
+import { ShieldAlert } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 const userProfile = {
   name: "Muhammed Razan",
@@ -34,17 +37,22 @@ export default function ProfilePage() {
   return (
     <AppLayout>
       <div className="max-w-3xl">
-        {/* Header Card */}
         <Card className="glass-card p-8 mb-8">
           <div className="flex items-center gap-6 mb-6">
             <Avatar className="h-24 w-24">
               <AvatarImage src={userProfile.image || "/placeholder.svg"} />
               <AvatarFallback>AJ</AvatarFallback>
             </Avatar>
-            <div>
+            <div className="flex-1">
               <h1 className="text-3xl font-bold">{userProfile.name}</h1>
               <p className="text-lg text-muted-foreground">{userProfile.level}</p>
             </div>
+            <Link href="/admin">
+              <Button className="gap-2">
+                <ShieldAlert size={18} />
+                Admin Panel
+              </Button>
+            </Link>
           </div>
 
           {/* XP Progress Bar */}
