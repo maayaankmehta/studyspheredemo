@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useParams } from "next/navigation"
 import { Users, LinkIcon, CheckCircle } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -7,25 +8,58 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import AppLayout from "@/components/app-layout"
+import { ForumPost } from "@/components/forum-post"
+import { CreateForumPostDialog } from "@/components/create-forum-post-dialog"
 
 const mockGroups: Record<string, any> = {
   "1": {
     id: "1",
-    name: "Full Stack Web Development",
-    subject: "22CS3AEFWD",
-    description: "All about Full stack web development.",
+    name: "Advanced Full Stack Development",
+    subject: "CS201",
+    description: "Deep dive into algorithm design, complexity analysis, and advanced data structures.",
     fullDescription:
-      "Welcome to the Full stack web development study group! This is a dedicated space for students passionate about mastering FWD. We cover topics including Frontend, Building APIs and more. Whether you're making a project or just want to deepen your domain knowledge, this group is for you.",
-    createdBy: "RazanCodes",
-    createdByImage: "https://api.dicebear.com/9.x/avataaars/svg?top=frizzle",
+      "Welcome to the Advanced Algorithms Masters study group! This is a dedicated space for students passionate about mastering algorithm design and complexity analysis. We cover topics including sorting algorithms, dynamic programming, graph algorithms, and more. Whether you're preparing for technical interviews or just want to deepen your algorithmic knowledge, this group is for you.",
+    createdBy: "Mayank Mehta",
+    createdByImage: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
     members: 24,
     chatLink: "https://discord.gg/algorithms",
     memberList: [
-      { name: "Sam Lee", image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sam" },
-      { name: "Jordan Chen", image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jordan" },
-      { name: "Emma Davis", image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Emma" },
-      { name: "Marcus Brown", image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus" },
-      { name: "Sofia Rodriguez", image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sofia" },
+      { name: "Razan  ", image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sam" },
+      { name: "Muzammil", image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jordan" },
+      { name: "Talib Khan", image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Emma" },
+      { name: "Nawaal", image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus" },
+      { name: "Jay", image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sofia" },
+    ],
+    sessions: [
+      { id: "1", name: "Dynamic Programming Basics" },
+      { id: "2", name: "Graph Theory Deep Dive" },
+      { id: "3", name: "Interview Prep Session" },
+    ],
+    posts: [
+      {
+        id: "1",
+        author: "Muzammil Zahoor",
+        authorImage: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sam",
+        content:
+          "Just solved the longest increasing subsequence problem! The DP approach is so elegant once you understand it.",
+        sessionTag: "Dynamic Programming Basics",
+        upvotes: 12,
+        downvotes: 0,
+        createdAt: "2 hours ago",
+        replies: 3,
+      },
+      {
+        id: "2",
+        author: "Talib Khan",
+        authorImage: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jordan",
+        content:
+          "Can anyone explain the difference between DFS and BFS? I'm still confused about when to use which one.",
+        sessionTag: "Graph Theory Deep Dive",
+        upvotes: 8,
+        downvotes: 0,
+        createdAt: "4 hours ago",
+        replies: 5,
+      },
     ],
   },
 }
@@ -34,6 +68,7 @@ export default function StudyGroupDetailPage() {
   const params = useParams()
   const groupId = params.id as string
   const group = mockGroups[groupId]
+  const [posts, setPosts] = useState(group?.posts || [])
 
   if (!group) {
     return (
@@ -43,6 +78,10 @@ export default function StudyGroupDetailPage() {
         </div>
       </AppLayout>
     )
+  }
+
+  const handlePostCreate = (newPost: any) => {
+    setPosts([newPost, ...posts])
   }
 
   return (
@@ -97,6 +136,29 @@ export default function StudyGroupDetailPage() {
                 </div>
               </div>
             </Card>
+
+            {/* Forum Section */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-2xl font-bold">Group Forum</h3>
+                <CreateForumPostDialog
+                  groupName={group.name}
+                  sessions={group.sessions}
+                  onPostCreate={handlePostCreate}
+                />
+              </div>
+
+              <div className="space-y-3">
+                {posts.length === 0 ? (
+                  <Card className="glass-card p-8 text-center border border-border/50">
+                    <p className="text-muted-foreground">No posts yet. Be the first to start a discussion!</p>
+                  </Card>
+                ) : (
+                  posts.map((post: any) => <ForumPost key={post.id} {...post} />)
+
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Right Column - Action Hub */}
@@ -118,7 +180,7 @@ export default function StudyGroupDetailPage() {
 
               {/* Members */}
               <div>
-                <p className="text-sm font-semibold mb-3">Members ({group.members})</p>
+                <p className="text-sm font-semibold mb-3">Members ({group.memberList.length})</p>
                 <div className="flex -space-x-2 mb-3">
                   {group.memberList.map((member: any, idx: number) => (
                     <Avatar key={idx} className="h-10 w-10 border-2 border-card">

@@ -27,24 +27,24 @@ interface GroupStats {
 const mockRequests: GroupRequest[] = [
   {
     id: "1",
-    groupName: "Advanced Algorithms Club",
-    creator: "Sarah Chen",
+    groupName: "Full stack web dev club",
+    creator: "Muzammil Zahhor",
     description: "For students interested in competitive programming and advanced data structures",
     createdAt: "2025-11-04",
     status: "pending",
   },
   {
     id: "2",
-    groupName: "Physics Study Circle",
-    creator: "James Wilson",
+    groupName: "Java Study Group",
+    creator: "Mayank Mehta",
     description: "Collaborative study group for physics fundamentals",
     createdAt: "2025-11-03",
     status: "pending",
   },
   {
     id: "3",
-    groupName: "Machine Learning Enthusiasts",
-    creator: "Emma Davis",
+    groupName: "Machine Learning gang",
+    creator: "Muhammed Razan",
     description: "Study group focused on ML algorithms and applications",
     createdAt: "2025-11-02",
     status: "approved",
@@ -52,7 +52,7 @@ const mockRequests: GroupRequest[] = [
   {
     id: "4",
     groupName: "Web Dev Bootcamp",
-    creator: "Alex Johnson",
+    creator: "Talib Khan",
     description: "Learning modern web development techniques",
     createdAt: "2025-11-01",
     status: "rejected",
@@ -60,11 +60,11 @@ const mockRequests: GroupRequest[] = [
 ]
 
 const mockStats: GroupStats = {
-  totalGroups: 24,
-  approvedGroups: 20,
-  rejectedGroups: 4,
-  totalSessions: 156,
-  activeSessions: 42,
+  totalGroups: 4,
+  approvedGroups: 2,
+  rejectedGroups: 1,
+  totalSessions: 16,
+  activeSessions: 2,
 }
 
 export default function AdminPage() {
@@ -216,6 +216,7 @@ export default function AdminPage() {
               </div>
             )}
           </TabsContent>
+
 
           {/* Rejected Requests */}
           <TabsContent value="rejected">
