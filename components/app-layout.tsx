@@ -1,13 +1,12 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { BrainCircuit, LayoutDashboard, Search, Trophy, User, Moon, BookOpen } from "lucide-react"
+import { usePathname } from 'next/navigation'
+import { BrainCircuit, LayoutDashboard, Search, Trophy, User, Moon, BookOpen } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useTheme } from "@/app/providers"
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -15,7 +14,7 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   const pathname = usePathname()
-  const [isDarkMode, setIsDarkMode] = useState(true)
+  const { isDark, toggleTheme } = useTheme()
 
   const navItems = [
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -63,11 +62,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <div className="absolute bottom-0 left-0 right-0 glass border-t border-border rounded-none p-4 space-y-3">
           <div className="flex items-center gap-3">
             <Avatar className="h-10 w-10 flex-shrink-0">
-              <AvatarImage src="https://api.dicebear.com/9.x/avataaars/svg?seed=Henry" />
+              <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alex" />
               <AvatarFallback>AJ</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold truncate">Muhammed Razan</p>
+              <p className="text-sm font-semibold truncate">Alex Johnson</p>
               <p className="text-xs text-muted-foreground">Level 4: Senior</p>
             </div>
           </div>
@@ -75,10 +74,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
             variant="ghost"
             size="sm"
             className="w-full justify-center gap-2 h-9"
-            onClick={() => setIsDarkMode(!isDarkMode)}
+            onClick={toggleTheme}
           >
             <Moon size={16} />
-            <span className="text-xs font-medium">Theme</span>
+            <span className="text-xs font-medium">{isDark ? "Light" : "Dark"}</span>
           </Button>
         </div>
       </aside>

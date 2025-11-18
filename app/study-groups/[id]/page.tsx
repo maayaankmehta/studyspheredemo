@@ -41,8 +41,8 @@ const mockGroups: Record<string, any> = {
         author: "Muzammil Zahoor",
         authorImage: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sam",
         content:
-          "Just solved the longest increasing subsequence problem! The DP approach is so elegant once you understand it.",
-        sessionTag: "Dynamic Programming Basics",
+          "Just Pushed to main branch it.",
+        sessionTag: "Front end basics",
         upvotes: 12,
         downvotes: 0,
         createdAt: "2 hours ago",
@@ -53,8 +53,8 @@ const mockGroups: Record<string, any> = {
         author: "Talib Khan",
         authorImage: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jordan",
         content:
-          "Can anyone explain the difference between DFS and BFS? I'm still confused about when to use which one.",
-        sessionTag: "Graph Theory Deep Dive",
+          "Enjoyed todays session. Can i get the notes for today?",
+        sessionTag: "Backend boys",
         upvotes: 8,
         downvotes: 0,
         createdAt: "4 hours ago",
