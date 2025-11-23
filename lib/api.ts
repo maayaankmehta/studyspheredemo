@@ -106,6 +106,17 @@ export const authAPI = {
         const response = await apiClient.put('/auth/me/', userData);
         return response.data;
     },
+
+    googleLogin: async (credential: string) => {
+        const response = await apiClient.post('/auth/google/', { credential });
+        const { tokens, user } = response.data;
+
+        // Store tokens
+        localStorage.setItem('access_token', tokens.access);
+        localStorage.setItem('refresh_token', tokens.refresh);
+
+        return { tokens, user };
+    },
 };
 
 // ============================================

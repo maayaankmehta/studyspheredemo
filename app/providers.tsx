@@ -3,6 +3,7 @@
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
 import { AuthProvider } from "@/lib/auth-context"
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 interface ThemeContextType {
   isDark: boolean
@@ -51,10 +52,14 @@ function ThemeProviderInner({ children }: { children: React.ReactNode }) {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
+
   return (
-    <AuthProvider>
-      <ThemeProviderInner>{children}</ThemeProviderInner>
-    </AuthProvider>
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <AuthProvider>
+        <ThemeProviderInner>{children}</ThemeProviderInner>
+      </AuthProvider>
+    </GoogleOAuthProvider>
   )
 }
 

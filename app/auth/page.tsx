@@ -9,10 +9,11 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAuth } from "@/lib/auth-context"
 import { GraduationCap } from "lucide-react"
+import { GoogleLogin, CredentialResponse } from '@react-oauth/google'
 
 export default function AuthPage() {
   const router = useRouter()
-  const { login, register, isAuthenticated } = useAuth()
+  const { login, loginWithGoogle, register, isAuthenticated } = useAuth()
 
   // Login state
   const [loginData, setLoginData] = useState({ username: "", password: "" })
@@ -51,6 +52,28 @@ export default function AuthPage() {
     } finally {
       setLoginLoading(false)
     }
+  }
+
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
+    setLoginError("")
+    setLoginLoading(true)
+
+    try {
+      if (credentialResponse.credential) {
+        await loginWithGoogle(credentialResponse.credential)
+        router.push("/")
+      } else {
+        setLoginError("No credential received from Google")
+      }
+    } catch (error: any) {
+      setLoginError(error.message || "Google login failed. Please try again.")
+    } finally {
+      setLoginLoading(false)
+    }
+  }
+
+  const handleGoogleError = () => {
+    setLoginError("Google login failed. Please try again.")
   }
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -136,6 +159,27 @@ export default function AuthPage() {
                 <Button type="submit" className="w-full" disabled={loginLoading}>
                   {loginLoading ? "Logging in..." : "Login"}
                 </Button>
+
+                <div className="relative my-6">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-muted"></div>
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                  </div>
+                </div>
+
+                <div className="flex justify-center">
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={handleGoogleError}
+                    useOneTap
+                    theme="outline"
+                    size="large"
+                    text="signin_with"
+                    width="100%"
+                  />
+                </div>
 
                 <div className="text-center text-sm text-muted-foreground mt-4">
                   <p>Demo credentials:</p>
