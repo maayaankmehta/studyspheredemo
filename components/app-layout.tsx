@@ -7,6 +7,7 @@ import { BrainCircuit, LayoutDashboard, Search, Trophy, User, Moon, BookOpen } f
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useTheme } from "@/app/providers"
+import { useAuth } from "@/lib/auth-context"
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -15,6 +16,7 @@ interface AppLayoutProps {
 export default function AppLayout({ children }: AppLayoutProps) {
   const pathname = usePathname()
   const { isDark, toggleTheme } = useTheme()
+  const { user, isAuthenticated } = useAuth()
 
   const navItems = [
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -62,12 +64,20 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <div className="absolute bottom-0 left-0 right-0 glass border-t border-border rounded-none p-4 space-y-3">
           <div className="flex items-center gap-3">
             <Avatar className="h-10 w-10 flex-shrink-0">
-              <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alex" />
-              <AvatarFallback>AJ</AvatarFallback>
+              <AvatarImage src={user?.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.username || 'user'}`} />
+              <AvatarFallback>{user?.username?.substring(0, 2).toUpperCase() || 'U'}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold truncate">Alex Johnson</p>
-              <p className="text-xs text-muted-foreground">Level 4: Senior</p>
+              <p className="text-sm font-semibold truncate">
+                {isAuthenticated
+                  ? (user?.first_name && user?.last_name
+                    ? `${user.first_name} ${user.last_name}`
+                    : user?.username || 'User')
+                  : 'Guest'}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {isAuthenticated ? `Level ${user?.level || 1}` : 'Not logged in'}
+              </p>
             </div>
           </div>
           <Button

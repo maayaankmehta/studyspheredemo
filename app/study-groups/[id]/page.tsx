@@ -1,92 +1,106 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
-import { Users, LinkIcon, CheckCircle } from "lucide-react"
+import { Users, CheckCircle, ArrowLeft } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import AppLayout from "@/components/app-layout"
-import { ForumPost } from "@/components/forum-post"
-import { CreateForumPostDialog } from "@/components/create-forum-post-dialog"
-
-const mockGroups: Record<string, any> = {
-  "1": {
-    id: "1",
-    name: "Advanced Full Stack Development",
-    subject: "CS201",
-    description: "Deep dive into algorithm design, complexity analysis, and advanced data structures.",
-    fullDescription:
-      "Welcome to the Advanced Algorithms Masters study group! This is a dedicated space for students passionate about mastering algorithm design and complexity analysis. We cover topics including sorting algorithms, dynamic programming, graph algorithms, and more. Whether you're preparing for technical interviews or just want to deepen your algorithmic knowledge, this group is for you.",
-    createdBy: "Mayank Mehta",
-    createdByImage: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
-    members: 24,
-    chatLink: "https://discord.gg/algorithms",
-    memberList: [
-      { name: "Razan  ", image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sam" },
-      { name: "Muzammil", image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jordan" },
-      { name: "Talib Khan", image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Emma" },
-      { name: "Nawaal", image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus" },
-      { name: "Jay", image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sofia" },
-    ],
-    sessions: [
-      { id: "1", name: "Dynamic Programming Basics" },
-      { id: "2", name: "Graph Theory Deep Dive" },
-      { id: "3", name: "Interview Prep Session" },
-    ],
-    posts: [
-      {
-        id: "1",
-        author: "Muzammil Zahoor",
-        authorImage: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sam",
-        content:
-          "Just Pushed to main branch it.",
-        sessionTag: "Front end basics",
-        upvotes: 12,
-        downvotes: 0,
-        createdAt: "2 hours ago",
-        replies: 3,
-      },
-      {
-        id: "2",
-        author: "Talib Khan",
-        authorImage: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jordan",
-        content:
-          "Enjoyed todays session. Can i get the notes for today?",
-        sessionTag: "Backend boys",
-        upvotes: 8,
-        downvotes: 0,
-        createdAt: "4 hours ago",
-        replies: 5,
-      },
-    ],
-  },
-}
+import { groupsAPI } from "@/lib/api"
+import { useAuth } from "@/lib/auth-context"
+import Link from "next/link"
 
 export default function StudyGroupDetailPage() {
   const params = useParams()
+  const { user } = useAuth()
   const groupId = params.id as string
-  const group = mockGroups[groupId]
-  const [posts, setPosts] = useState(group?.posts || [])
 
-  if (!group) {
+  const [group, setGroup] = useState<any>(null)
+  const [sessions, setSessions] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [isJoining, setIsJoining] = useState(false)
+
+  useEffect(() => {
+    const fetchGroupData = async () => {
+      try {
+        setLoading(true)
+        const [groupData, sessionsData] = await Promise.all([
+          groupsAPI.getById(groupId),
+          groupsAPI.getSessions(groupId)
+        ])
+        setGroup(groupData)
+        setSessions(Array.isArray(sessionsData) ? sessionsData : [])
+        setError(null)
+      } catch (err: any) {
+        console.error("Failed to fetch group:", err)
+        setError("Study group not found")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (groupId) {
+      fetchGroupData()
+    }
+  }, [groupId])
+
+  const handleJoinGroup = async () => {
+    try {
+      setIsJoining(true)
+      await groupsAPI.join(groupId)
+      const updatedGroup = await groupsAPI.getById(groupId)
+      setGroup(updatedGroup)
+    } catch (err: any) {
+      console.error("Failed to join group:", err)
+      alert(err.response?.data?.detail || "Failed to join group")
+    } finally {
+      setIsJoining(false)
+    }
+  }
+
+  if (loading) {
     return (
       <AppLayout>
         <div className="text-center py-20">
-          <h1 className="text-2xl font-bold">Study group not found</h1>
+          <p className="text-muted-foreground">Loading group...</p>
         </div>
       </AppLayout>
     )
   }
 
-  const handlePostCreate = (newPost: any) => {
-    setPosts([newPost, ...posts])
+  if (error || !group) {
+    return (
+      <AppLayout>
+        <div className="text-center py-20">
+          <h1 className="text-2xl font-bold mb-4">Study group not found</h1>
+          <Link href="/study-groups">
+            <Button variant="outline" className="gap-2">
+              <ArrowLeft size={18} />
+              Back to Groups
+            </Button>
+          </Link>
+        </div>
+      </AppLayout>
+    )
   }
+
+  const isMember = group.members?.some((m: any) => m.id === user?.id)
 
   return (
     <AppLayout>
       <div className="max-w-5xl">
+        <div className="mb-6">
+          <Link href="/study-groups">
+            <Button variant="ghost" className="gap-2 mb-4">
+              <ArrowLeft size={18} />
+              Back to Groups
+            </Button>
+          </Link>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Information */}
           <div className="lg:col-span-2 space-y-6">
@@ -99,24 +113,18 @@ export default function StudyGroupDetailPage() {
             </div>
 
             {/* Created by */}
-            <Card className="glass-card p-4 mx-0 px-4 py-3.5">
+            <Card className="glass-card p-4">
               <p className="text-sm text-muted-foreground mb-3">Created by</p>
               <div className="flex items-center gap-3">
                 <Avatar className="h-12 w-12">
-                  <AvatarImage src={group.createdByImage || "/placeholder.svg"} />
-                  <AvatarFallback>{group.createdBy.substring(0, 2)}</AvatarFallback>
+                  <AvatarImage src={group.creator_image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${group.creator_name}`} />
+                  <AvatarFallback>{group.creator_name?.substring(0, 2).toUpperCase()}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-semibold">{group.createdBy}</p>
+                  <p className="font-semibold">{group.creator_name}</p>
                   <p className="text-sm text-muted-foreground">Group Founder</p>
                 </div>
               </div>
-            </Card>
-
-            {/* About the Group */}
-            <Card className="glass-card p-6 leading-3">
-              <h3 className="font-semibold mb-4">About This Group</h3>
-              <p className="text-muted-foreground leading-relaxed">{group.fullDescription}</p>
             </Card>
 
             {/* Group Stats */}
@@ -128,7 +136,7 @@ export default function StudyGroupDetailPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-3 bg-secondary/50 rounded-lg">
                   <p className="text-xs text-muted-foreground">Total Members</p>
-                  <p className="text-2xl font-bold">{group.members}</p>
+                  <p className="text-2xl font-bold">{group.members_count || 0}</p>
                 </div>
                 <div className="p-3 bg-secondary/50 rounded-lg">
                   <p className="text-xs text-muted-foreground">Study Focus</p>
@@ -137,62 +145,90 @@ export default function StudyGroupDetailPage() {
               </div>
             </Card>
 
-            {/* Forum Section */}
+            {/* Sessions Section */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-2xl font-bold">Group Forum</h3>
-                <CreateForumPostDialog
-                  groupName={group.name}
-                  sessions={group.sessions}
-                  onPostCreate={handlePostCreate}
-                />
-              </div>
-
-              <div className="space-y-3">
-                {posts.length === 0 ? (
-                  <Card className="glass-card p-8 text-center border border-border/50">
-                    <p className="text-muted-foreground">No posts yet. Be the first to start a discussion!</p>
-                  </Card>
-                ) : (
-                  posts.map((post: any) => <ForumPost key={post.id} {...post} />)
-
-                )}
-              </div>
+              <h3 className="text-2xl font-bold">Upcoming Sessions</h3>
+              {sessions && sessions.length > 0 ? (
+                <div className="space-y-3">
+                  {sessions.map((session: any) => (
+                    <Card key={session.id} className="glass-card p-4">
+                      <Link href={`/session/${session.id}`} className="block hover:opacity-80 transition-opacity">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1">
+                            <h4 className="font-semibold mb-1">{session.title}</h4>
+                            <p className="text-sm text-muted-foreground mb-2">{session.course_code}</p>
+                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                              <span>📅 {session.date}</span>
+                              <span>🕒 {session.time}</span>
+                              <span>📍 {session.location}</span>
+                            </div>
+                          </div>
+                          <Badge variant="secondary" className="text-xs">
+                            {session.attendees_count || 0} going
+                          </Badge>
+                        </div>
+                      </Link>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <Card className="glass-card p-8 text-center border border-border/50">
+                  <p className="text-muted-foreground">
+                    {isMember
+                      ? "No upcoming sessions. Check the Discover page to create one!"
+                      : "Join the group to see upcoming sessions"}
+                  </p>
+                </Card>
+              )}
             </div>
           </div>
 
           {/* Right Column - Action Hub */}
           <div className="lg:col-span-1">
             <div className="glass-card p-6 rounded-lg sticky top-8 space-y-4">
-              <Button size="lg" className="w-full gap-2">
-                <CheckCircle size={18} />
-                Join Group
-              </Button>
-
-              {group.chatLink && (
-                <Button variant="outline" size="lg" className="w-full gap-2 bg-transparent" asChild>
-                  <a href={group.chatLink} target="_blank" rel="noopener noreferrer">
-                    <LinkIcon size={18} />
-                    Open Chat
-                  </a>
+              {isMember ? (
+                <div className="p-4 bg-primary/10 rounded-lg text-center">
+                  <CheckCircle size={24} className="text-primary mx-auto mb-2" />
+                  <p className="text-sm font-semibold">You're a member!</p>
+                </div>
+              ) : (
+                <Button
+                  size="lg"
+                  className="w-full gap-2"
+                  onClick={handleJoinGroup}
+                  disabled={isJoining}
+                >
+                  <CheckCircle size={18} />
+                  {isJoining ? "Joining..." : "Join Group"}
                 </Button>
               )}
 
               {/* Members */}
               <div>
-                <p className="text-sm font-semibold mb-3">Members ({group.memberList.length})</p>
-                <div className="flex -space-x-2 mb-3">
-                  {group.memberList.map((member: any, idx: number) => (
-                    <Avatar key={idx} className="h-10 w-10 border-2 border-card">
-                      <AvatarImage src={member.image || "/placeholder.svg"} />
-                      <AvatarFallback>{member.name.substring(0, 2)}</AvatarFallback>
-                    </Avatar>
-                  ))}
-                </div>
+                <p className="text-sm font-semibold mb-3">Members ({group.members_count || 0})</p>
+                {group.members && group.members.length > 0 ? (
+                  <div className="flex -space-x-2 mb-3">
+                    {group.members.slice(0, 5).map((member: any, idx: number) => (
+                      <Avatar key={idx} className="h-10 w-10 border-2 border-card">
+                        <AvatarImage src={member.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${member.username}`} />
+                        <AvatarFallback>{member.username?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                    ))}
+                    {group.members.length > 5 && (
+                      <div className="h-10 w-10 rounded-full bg-secondary border-2 border-card flex items-center justify-center text-xs font-semibold">
+                        +{group.members.length - 5}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">No members yet</p>
+                )}
               </div>
 
               <p className="text-xs text-muted-foreground text-center py-2">
-                Join {group.members} students in this study group
+                {isMember
+                  ? `You and ${group.members_count - 1} others in this group`
+                  : `Join ${group.members_count} students in this study group`}
               </p>
             </div>
           </div>

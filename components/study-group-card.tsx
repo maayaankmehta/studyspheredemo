@@ -43,9 +43,6 @@ export default function StudyGroupCard({ group }: StudyGroupCardProps) {
               variant="secondary"
               size="sm"
               className="text-xs font-medium h-8 px-3"
-              onClick={(e) => {
-                e.preventDefault()
-              }}
             >
               View Group
             </Button>

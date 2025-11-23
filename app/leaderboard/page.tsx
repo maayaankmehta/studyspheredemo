@@ -1,9 +1,12 @@
 "use client"
+
+import { useEffect, useState } from "react"
 import { Trophy } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import AppLayout from "@/components/app-layout"
+import { leaderboardAPI } from "@/lib/api"
 
 const badgeDefinitions = {
   Initiator: { color: "bg-yellow-500/20", textColor: "text-yellow-600" },
@@ -14,125 +17,6 @@ const badgeDefinitions = {
   "Study Buddy": { color: "bg-cyan-500/20", textColor: "text-cyan-600" },
 }
 
-const leaderboardData = {
-  thisWeek: [
-    {
-      rank: 1,
-      name: "Muhammed Razan",
-      xp: 1250,
-      image: "https://api.dicebear.com/9.x/avataaars/svg?seed=Henry",
-      badge: "Rising Star",
-    },
-    {
-      rank: 2,
-      name: "Jensen Huang",
-      xp: 1120,
-      image: "https://api.dicebear.com/9.x/avataaars/svg?top=frizzle",
-      badge: "Knowledge Seeker",
-    },
-    {
-      rank: 3,
-      name: "Steve Jobs",
-      xp: 980,
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Punjab",
-      badge: "Team Player",
-    },
-    {
-      rank: 4,
-      name: "Mayank Mehta",
-      xp: 890,
-      image: "https://api.dicebear.com/9.x/avataaars/svg?seed=Human",
-      badge: "Study Buddy",
-    },
-    {
-      rank: 5,
-      name: "Muzammil Zahoor",
-      xp: 750,
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Rashford",
-      badge: "Initiator",
-    },
-    {
-      rank: 6,
-      name: "Talib Khan",
-      xp: 620,
-      image: "https://api.dicebear.com/9.x/avataaars/svg?seed=james",
-      badge: "Weekend Warrior",
-    },
-    {
-      rank: 7,
-      name: "Nawaalur",
-      xp: 540,
-      image: "https://api.dicebear.com/9.x/avataaars/svg?seed=Henry",
-      badge: "Knowledge Seeker",
-    },
-    {
-      rank: 8,
-      name: "Mayank Verma",
-      xp: 480,
-      image: "https://api.dicebear.com/9.x/avataaars/svg?seed=yourSeed&facialHair=beardMedium,beardLight&top=shortHair01,shortHair02",
-      badge: "Team Player",
-    },
-  ],
-  allTime: [
-    {
-      rank: 1,
-      name: "Muhammed Razan",
-      xp: 4200,
-      image: "https://api.dicebear.com/9.x/avataaars/svg?seed=Henry  ",
-      badge: "Rising Star",
-    },
-    {
-      rank: 2,
-      name: "Mayank Mehta",
-      xp: 3850,
-      image: "https://api.dicebear.com/9.x/avataaars/svg?seed=Human",
-      badge: "Knowledge Seeker",
-    },
-    {
-      rank: 3,
-      name: "Muzammil Zahoor",
-      xp: 3650,
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sam",
-      badge: "Study Buddy",
-    },
-    {
-      rank: 4,
-      name: "Talib Khan",
-      xp: 3420,
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Emma",
-      badge: "Team Player",
-    },
-    {
-      rank: 5,
-      name: "Nawalur",
-      xp: 3200,
-      image: "https://api.dicebear.com/9.x/avataaars/svg?seed=Henry",
-      badge: "Initiator",
-    },
-    {
-      rank: 6,
-      name: "Mayank Jain",
-      xp: 2950,
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sofia",
-      badge: "Weekend Warrior",
-    },
-    {
-      rank: 7,
-      name: "Steve Jobs",
-      xp: 2840,
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Punjab",
-      badge: "Rising Star",
-    },
-    {
-      rank: 8,
-      name: "Jensen Huang",
-      xp: 2650,
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Isabella",
-      badge: "Knowledge Seeker",
-    },
-  ],
-}
-
 function MedalIcon({ rank }: { rank: number }) {
   if (rank === 1) return <Trophy size={20} className="text-yellow-500" />
   if (rank === 2) return <Trophy size={20} className="text-gray-400" />
@@ -140,8 +24,8 @@ function MedalIcon({ rank }: { rank: number }) {
   return null
 }
 
-function LeaderboardRow({ item }: { item: (typeof leaderboardData.thisWeek)[0] }) {
-  const badge = badgeDefinitions[item.badge as keyof typeof badgeDefinitions]
+function LeaderboardRow({ item }: { item: any }) {
+  const badge = badgeDefinitions[item.badge as keyof typeof badgeDefinitions] || badgeDefinitions["Rising Star"]
 
   return (
     <Card className="glass-card p-4 mb-3">
@@ -155,11 +39,11 @@ function LeaderboardRow({ item }: { item: (typeof leaderboardData.thisWeek)[0] }
             )}
           </div>
           <Avatar className="h-10 w-10">
-            <AvatarImage src={item.image || "/placeholder.svg"} />
-            <AvatarFallback>{item.name.substring(0, 2)}</AvatarFallback>
+            <AvatarImage src={item.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${item.username}`} />
+            <AvatarFallback>{item.username?.substring(0, 2)}</AvatarFallback>
           </Avatar>
           <div className="flex-1">
-            <span className="font-semibold">{item.name}</span>
+            <span className="font-semibold">{item.first_name && item.last_name ? `${item.first_name} ${item.last_name}` : item.username}</span>
             <div className="mt-1">
               <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${badge.color} ${badge.textColor}`}>
                 {item.badge}
@@ -167,35 +51,78 @@ function LeaderboardRow({ item }: { item: (typeof leaderboardData.thisWeek)[0] }
             </div>
           </div>
         </div>
-        <span className="font-bold text-lg text-primary">{item.xp.toLocaleString()} XP</span>
+        <span className="font-bold text-lg text-primary">{item.xp?.toLocaleString()} XP</span>
       </div>
     </Card>
   )
 }
 
 export default function LeaderboardPage() {
+  const [period, setPeriod] = useState<'week' | 'all'>('week')
+  const [leaderboard, setLeaderboard] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        setLoading(true)
+        const data = await leaderboardAPI.get(period)
+        setLeaderboard(data)
+        setError(null)
+      } catch (err: any) {
+        console.error("Failed to fetch leaderboard:", err)
+        setError("Failed to load leaderboard. Please try again.")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchLeaderboard()
+  }, [period])
+
+  const handleTabChange = (value: string) => {
+    setPeriod(value as 'week' | 'all')
+  }
+
   return (
     <AppLayout>
       <div className="max-w-3xl">
         <h1 className="text-4xl font-bold mb-8">Student Leaderboard</h1>
 
-        <Tabs defaultValue="thisWeek" className="w-full">
+        <Tabs value={period} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full max-w-md grid-cols-2 mb-8">
-            <TabsTrigger value="thisWeek">This Week</TabsTrigger>
-            <TabsTrigger value="allTime">All-Time</TabsTrigger>
+            <TabsTrigger value="week">This Week</TabsTrigger>
+            <TabsTrigger value="all">All-Time</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="thisWeek" className="space-y-3">
-            {leaderboardData.thisWeek.map((item) => (
-              <LeaderboardRow key={item.rank} item={item} />
-            ))}
-          </TabsContent>
+          {loading && (
+            <div className="text-center py-16">
+              <p className="text-muted-foreground text-sm">Loading leaderboard...</p>
+            </div>
+          )}
 
-          <TabsContent value="allTime" className="space-y-3">
-            {leaderboardData.allTime.map((item) => (
-              <LeaderboardRow key={item.rank} item={item} />
-            ))}
-          </TabsContent>
+          {error && (
+            <div className="text-center py-16">
+              <p className="text-red-500 text-sm">{error}</p>
+            </div>
+          )}
+
+          {!loading && !error && (
+            <>
+              <TabsContent value="week" className="space-y-3">
+                {leaderboard.map((item) => (
+                  <LeaderboardRow key={item.id} item={item} />
+                ))}
+              </TabsContent>
+
+              <TabsContent value="all" className="space-y-3">
+                {leaderboard.map((item) => (
+                  <LeaderboardRow key={item.id} item={item} />
+                ))}
+              </TabsContent>
+            </>
+          )}
         </Tabs>
       </div>
     </AppLayout>

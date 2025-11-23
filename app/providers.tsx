@@ -2,6 +2,7 @@
 
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
+import { AuthProvider } from "@/lib/auth-context"
 
 interface ThemeContextType {
   isDark: boolean
@@ -10,7 +11,7 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+function ThemeProviderInner({ children }: { children: React.ReactNode }) {
   const [isDark, setIsDark] = useState(true)
   const [mounted, setMounted] = useState(false)
 
@@ -28,14 +29,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!mounted) return
-    
+
     const htmlElement = document.documentElement
     if (isDark) {
       htmlElement.classList.add("dark")
     } else {
       htmlElement.classList.remove("dark")
     }
-    
+
     // Save preference to localStorage
     localStorage.setItem("theme", isDark ? "dark" : "light")
   }, [isDark, mounted])
@@ -46,6 +47,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     <ThemeContext.Provider value={{ isDark, toggleTheme }}>
       {mounted ? children : null}
     </ThemeContext.Provider>
+  )
+}
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <AuthProvider>
+      <ThemeProviderInner>{children}</ThemeProviderInner>
+    </AuthProvider>
   )
 }
 

@@ -1,95 +1,109 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import AppLayout from "@/components/app-layout"
 import { CheckCircle, XCircle, BarChart3, Users, BookOpen } from "lucide-react"
+import { adminAPI } from "@/lib/api"
+import { useAuth } from "@/lib/auth-context"
 
 interface GroupRequest {
   id: string
-  groupName: string
-  creator: string
+  name: string
+  creator_name: string
   description: string
-  createdAt: string
+  created_at: string
   status: "pending" | "approved" | "rejected"
 }
 
-interface GroupStats {
-  totalGroups: number
-  approvedGroups: number
-  rejectedGroups: number
-  totalSessions: number
-  activeSessions: number
-}
-
-const mockRequests: GroupRequest[] = [
-  {
-    id: "1",
-    groupName: "Full stack web dev club",
-    creator: "Muzammil Zahhor",
-    description: "For students interested in competitive programming and advanced data structures",
-    createdAt: "2025-11-04",
-    status: "pending",
-  },
-  {
-    id: "2",
-    groupName: "Java Study Group",
-    creator: "Mayank Mehta",
-    description: "Collaborative study group for physics fundamentals",
-    createdAt: "2025-11-03",
-    status: "pending",
-  },
-  {
-    id: "3",
-    groupName: "Machine Learning gang",
-    creator: "Muhammed Razan",
-    description: "Study group focused on ML algorithms and applications",
-    createdAt: "2025-11-02",
-    status: "approved",
-  },
-  {
-    id: "4",
-    groupName: "Web Dev Bootcamp",
-    creator: "Talib Khan",
-    description: "Learning modern web development techniques",
-    createdAt: "2025-11-01",
-    status: "rejected",
-  },
-]
-
-const mockStats: GroupStats = {
-  totalGroups: 4,
-  approvedGroups: 2,
-  rejectedGroups: 1,
-  totalSessions: 16,
-  activeSessions: 2,
-}
-
 export default function AdminPage() {
-  const [requests, setRequests] = useState<GroupRequest[]>(mockRequests)
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth()
+  const [adminData, setAdminData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleApprove = (id: string) => {
-    setRequests(requests.map((req) => (req.id === id ? { ...req, status: "approved" } : req)))
+  useEffect(() => {
+    if (authLoading) return
+
+    if (!isAuthenticated || !user?.is_staff) {
+      if (typeof window !== 'undefined') {
+        window.location.href = '/'
+      }
+      return
+    }
+
+    fetchAdminData()
+  }, [isAuthenticated, authLoading, user])
+
+  const fetchAdminData = async () => {
+    try {
+      setLoading(true)
+      const data = await adminAPI.getGroups()
+      setAdminData(data)
+      setError(null)
+    } catch (err: any) {
+      console.error("Failed to fetch admin data:", err)
+      setError("Failed to load admin data. Please try again.")
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleReject = (id: string) => {
-    setRequests(requests.map((req) => (req.id === id ? { ...req, status: "rejected" } : req)))
+  const handleApprove = async (id: string) => {
+    try {
+      await adminAPI.approveGroup(id)
+      fetchAdminData() // Refresh data
+    } catch (err) {
+      console.error("Failed to approve group:", err)
+      alert("Failed to approve group")
+    }
   }
 
-  const pendingRequests = requests.filter((r) => r.status === "pending")
-  const approvedRequests = requests.filter((r) => r.status === "approved")
-  const rejectedRequests = requests.filter((r) => r.status === "rejected")
+  const handleReject = async (id: string) => {
+    try {
+      await adminAPI.rejectGroup(id)
+      fetchAdminData() // Refresh data
+    } catch (err) {
+      console.error("Failed to reject group:", err)
+      alert("Failed to reject group")
+    }
+  }
+
+  if (authLoading || loading) {
+    return (
+      <AppLayout>
+        <div className="text-center py-20">
+          <p className="text-muted-foreground text-sm">Loading admin panel...</p>
+        </div>
+      </AppLayout>
+    )
+  }
+
+  if (error || !adminData) {
+    return (
+      <AppLayout>
+        <div className="text-center py-20">
+          <p className="text-red-500 text-sm">{error || "Failed to load admin data"}</p>
+        </div>
+      </AppLayout>
+    )
+  }
+
+  const pendingRequests = adminData.pending || []
+  const approvedRequests = adminData.approved || []
+  const rejectedRequests = adminData.rejected || []
+  const stats = adminData.stats || {}
 
   const RequestCard = ({ request, showActions }: { request: GroupRequest; showActions: boolean }) => (
     <Card className="glass-card p-6 mb-4">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
-          <h3 className="font-semibold text-lg mb-1">{request.groupName}</h3>
-          <p className="text-sm text-muted-foreground mb-2">Created by: {request.creator}</p>
+          <h3 className="font-semibold text-lg mb-1">{request.name}</h3>
+          <p className="text-sm text-muted-foreground mb-2">Created by: {request.creator_name}</p>
           <p className="text-sm mb-3">{request.description}</p>
-          <p className="text-xs text-muted-foreground">{request.createdAt}</p>
+          <p className="text-xs text-muted-foreground">{new Date(request.created_at).toLocaleDateString()}</p>
         </div>
         {showActions && (
           <div className="flex gap-2">
@@ -110,9 +124,8 @@ export default function AdminPage() {
         )}
         {!showActions && (
           <div
-            className={`px-3 py-1 rounded-full text-sm font-medium ${
-              request.status === "approved" ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"
-            }`}
+            className={`px-3 py-1 rounded-full text-sm font-medium ${request.status === "approved" ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"
+              }`}
           >
             {request.status === "approved" ? "Approved" : "Rejected"}
           </div>
@@ -136,7 +149,7 @@ export default function AdminPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Total Groups</p>
-                <p className="text-2xl font-bold">{mockStats.totalGroups}</p>
+                <p className="text-2xl font-bold">{stats.total_groups || 0}</p>
               </div>
               <BookOpen size={32} className="text-primary/50" />
             </div>
@@ -145,7 +158,7 @@ export default function AdminPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Approved</p>
-                <p className="text-2xl font-bold text-green-400">{mockStats.approvedGroups}</p>
+                <p className="text-2xl font-bold text-green-400">{stats.approved_groups || 0}</p>
               </div>
               <CheckCircle size={32} className="text-green-400/50" />
             </div>
@@ -154,7 +167,7 @@ export default function AdminPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Rejected</p>
-                <p className="text-2xl font-bold text-red-400">{mockStats.rejectedGroups}</p>
+                <p className="text-2xl font-bold text-red-400">{stats.rejected_groups || 0}</p>
               </div>
               <XCircle size={32} className="text-red-400/50" />
             </div>
@@ -163,7 +176,7 @@ export default function AdminPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Total Sessions</p>
-                <p className="text-2xl font-bold">{mockStats.totalSessions}</p>
+                <p className="text-2xl font-bold">{stats.total_sessions || 0}</p>
               </div>
               <BarChart3 size={32} className="text-blue-400/50" />
             </div>
@@ -172,7 +185,7 @@ export default function AdminPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Active Sessions</p>
-                <p className="text-2xl font-bold text-cyan-400">{mockStats.activeSessions}</p>
+                <p className="text-2xl font-bold text-cyan-400">{stats.active_sessions || 0}</p>
               </div>
               <Users size={32} className="text-cyan-400/50" />
             </div>
@@ -195,7 +208,7 @@ export default function AdminPage() {
               </Card>
             ) : (
               <div>
-                {pendingRequests.map((req) => (
+                {pendingRequests.map((req: GroupRequest) => (
                   <RequestCard key={req.id} request={req} showActions={true} />
                 ))}
               </div>
@@ -210,13 +223,12 @@ export default function AdminPage() {
               </Card>
             ) : (
               <div>
-                {approvedRequests.map((req) => (
+                {approvedRequests.map((req: GroupRequest) => (
                   <RequestCard key={req.id} request={req} showActions={false} />
                 ))}
               </div>
             )}
           </TabsContent>
-
 
           {/* Rejected Requests */}
           <TabsContent value="rejected">
@@ -226,7 +238,7 @@ export default function AdminPage() {
               </Card>
             ) : (
               <div>
-                {rejectedRequests.map((req) => (
+                {rejectedRequests.map((req: GroupRequest) => (
                   <RequestCard key={req.id} request={req} showActions={false} />
                 ))}
               </div>

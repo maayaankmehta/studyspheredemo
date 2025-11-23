@@ -1,127 +1,50 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Search, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import StudySessionCard from "@/components/study-session-card"
 import CreateSessionDialog from "@/components/create-session-dialog"
 import AppLayout from "@/components/app-layout"
-
-const mockSessions = [
-  {
-    id: "1",
-    courseCode: "22CS3AEFWD",
-    title: "Full Stack Web Development",
-    date: "Oct 22",
-    time: "8:00 AM - 10:00 AM",
-    location: "CSE-UG LAB2",
-    attendees: 4,
-    hostName: "RazanCodes",
-    groupName: "Team StudySphere",
-  },
-  {
-    id: "2",
-    courseCode: "23MA3BSSDM",
-    title: "Probability Practice",
-    date: "Oct 23",
-    time: "1:00 PM - 2:00 PM",
-    location: "Reference Section, 1st Floor PJA Block",
-    attendees: 8,
-    hostName: "Talib Khan",
-    groupName: "SDM Group",
-  },
-  {
-    id: "3",
-    courseCode: "23CS3PCOOJ ",
-    title: "Java Coding Session (cie-1)",
-    date: "Oct 25",
-    time: "3:00 PM - 5:00 PM",
-    location: "CSE Dept, Room 102",
-    attendees: 12,
-    hostName: "RazanCodes",
-    groupName: "Backend Fans",
-  },
-  {
-  id: "4",
-  courseCode: "23CS3ESCOA",
-  title: "Computer Architecture Revision",
-  date: "Oct 26",
-  time: "10:00 AM - 12:00 PM",
-  location: "CSE-UG LAB1",
-  attendees: 6,
-  hostName: "Aditya Sharma",
-  groupName: "Architecture Masters",
-},
-{
-  id: "5",
-  courseCode: "23CS3PCLOD",
-  title: "Logic Design Problem Solving",
-  date: "Oct 27",
-  time: "2:00 PM - 4:00 PM",
-  location: "CSE Dept, Room 205",
-  attendees: 10,
-  hostName: "Priya Menon",
-  groupName: "Digital Logic Squad",
-},
-{
-  id: "6",
-  courseCode: "23CS3PCDBM",
-  title: "Database Queries Workshop",
-  date: "Oct 28",
-  time: "9:00 AM - 11:00 AM",
-  location: "CSE-UG LAB3",
-  attendees: 15,
-  hostName: "RazanCodes",
-  groupName: "DB Engineers",
-},
-{
-  id: "7",
-  courseCode: "23CS3PCDST",
-  title: "Data Structures & Algorithms Bootcamp",
-  date: "Oct 29",
-  time: "11:00 AM - 1:00 PM",
-  location: "Reference Section, 2nd Floor PJA Block",
-  attendees: 20,
-  hostName: "Vikram Singh",
-  groupName: "Algo Enthusiasts",
-},
-{
-  id: "8",
-  courseCode: "23CS3PCUSP",
-  title: "Unix Shell Scripting Practice",
-  date: "Oct 30",
-  time: "4:00 PM - 6:00 PM",
-  location: "CSE-UG LAB2",
-  attendees: 7,
-  hostName: "Neha Gupta",
-  groupName: "Linux Lovers",
-},
-{
-  id: "9",
-  courseCode: "23MA3BSSDM",
-  title: "Statistics for Computing - CIE Prep",
-  date: "Oct 31",
-  time: "10:00 AM - 12:00 PM",
-  location: "CSE Dept, Room 108",
-  attendees: 9,
-  hostName: "Talib Khan",
-  groupName: "SDM Group",
-},
-]
+import { sessionsAPI } from "@/lib/api"
 
 export default function DiscoverPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [activeFilter, setActiveFilter] = useState("All")
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [sessions, setSessions] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const filters = ["All", "Online", "In-Person", "This Week", "Exam Prep"]
 
-  const filteredSessions = mockSessions.filter((session) => {
+  // Fetch sessions from API
+  useEffect(() => {
+    const fetchSessions = async () => {
+      try {
+        setLoading(true)
+        const data = await sessionsAPI.getAll()
+        // Handle both array and paginated response formats
+        const sessionsArray = Array.isArray(data) ? data : (data.results || [])
+        setSessions(sessionsArray)
+        setError(null)
+      } catch (err: any) {
+        console.error("Failed to fetch sessions:", err)
+        setError("Failed to load sessions. Please try again.")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchSessions()
+  }, [])
+
+  const filteredSessions = sessions.filter((session) => {
     const matchesSearch =
-      session.courseCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      session.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      session.groupName.toLowerCase().includes(searchTerm.toLowerCase())
+      session.course_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      session.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      session.group_name?.toLowerCase().includes(searchTerm.toLowerCase())
 
     if (activeFilter === "All") return matchesSearch
     if (activeFilter === "Online")
@@ -129,10 +52,18 @@ export default function DiscoverPage() {
     if (activeFilter === "In-Person")
       return matchesSearch && session.location !== "Discord Link" && session.location !== "Online"
     if (activeFilter === "This Week") return matchesSearch
-    if (activeFilter === "Exam Prep") return matchesSearch && session.title.toLowerCase().includes("cie")
+    if (activeFilter === "Exam Prep") return matchesSearch && session.title?.toLowerCase().includes("cie")
 
     return matchesSearch
   })
+
+  // Refresh sessions after creating a new one
+  const handleSessionCreated = () => {
+    sessionsAPI.getAll().then(data => {
+      const sessionsArray = Array.isArray(data) ? data : (data.results || [])
+      setSessions(sessionsArray)
+    })
+  }
 
   return (
     <AppLayout>
@@ -174,20 +105,43 @@ export default function DiscoverPage() {
           ))}
         </div>
 
-        {/* Sessions Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredSessions.map((session) => (
-            <StudySessionCard key={session.id} session={session} compact={true} />
-          ))}
-        </div>
+        {/* Loading State */}
+        {loading && (
+          <div className="text-center py-16">
+            <p className="text-muted-foreground text-sm">Loading sessions...</p>
+          </div>
+        )}
 
-        {filteredSessions.length === 0 && (
+        {/* Error State */}
+        {error && (
+          <div className="text-center py-16">
+            <p className="text-red-500 text-sm">{error}</p>
+          </div>
+        )}
+
+        {/* Sessions Grid */}
+        {!loading && !error && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filteredSessions.map((session) => (
+              <StudySessionCard
+                key={session.id}
+                session={session}
+                compact={true}
+              />
+            ))}
+          </div>
+        )}
+
+        {!loading && !error && filteredSessions.length === 0 && (
           <div className="text-center py-16">
             <p className="text-muted-foreground text-sm">No sessions found matching your search.</p>
           </div>
         )}
 
-        <CreateSessionDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen} />
+        <CreateSessionDialog
+          open={isCreateDialogOpen}
+          onOpenChange={setIsCreateDialogOpen}
+        />
       </div>
     </AppLayout>
   )

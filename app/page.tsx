@@ -1,46 +1,52 @@
 "use client"
+
+import { useState, useEffect } from "react"
 import { CalendarPlus, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import StudySessionCard from "@/components/study-session-card"
 import AppLayout from "@/components/app-layout"
-
-const mockUpcomingSessions = [
-  {
-    id: "1",
-    courseCode: "22CS3AEFWD",
-    title: "Full Stack Web Development",
-    date: "Oct 22",
-    time: "8:00 AM - 10:00 AM",
-    location: "CSE-UG LAB2",
-    attendees: 4,
-    hostName: "RazanCodes",
-    groupName: "Team StudySphere",
-  },
-  {
-    id: "2",
-    courseCode: "23MA3BSSDM",
-    title: "Probability Practice",
-    date: "Oct 23",
-    time: "1:00 PM - 2:00 PM",
-    location: "Reference Section, 1st Floor PJA Block",
-    attendees: 8,
-    hostName: "Talib Khan",
-    groupName: "SDM Group",
-  },
-  {
-    id: "3",
-    courseCode: "23CS3PCOOJ ",
-    title: "Java Coding Session (cie-1)",
-    date: "Oct 25",
-    time: "3:00 PM - 5:00 PM",
-    location: "CSE Dept, Room 102",
-    attendees: 12,
-    hostName: "RazanCodes",
-    groupName: "Backend Fans",
-  },
-]
+import { dashboardAPI } from "@/lib/api"
+import { useAuth } from "@/lib/auth-context"
 
 export default function DashboardPage() {
+  const { isAuthenticated, isLoading: authLoading } = useAuth()
+  const [upcomingSessions, setUpcomingSessions] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (authLoading) return
+
+    const fetchDashboard = async () => {
+      if (!isAuthenticated) {
+        setLoading(false)
+        return
+      }
+
+      try {
+        setLoading(true)
+        const data = await dashboardAPI.getData()
+        setUpcomingSessions(data.upcoming_sessions || [])
+        setError(null)
+      } catch (err: any) {
+        console.error("Failed to fetch dashboard:", err)
+        setError("Failed to load dashboard. Please try again.")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchDashboard()
+  }, [isAuthenticated, authLoading])
+
+  // Redirect to auth if not authenticated
+  if (!authLoading && !isAuthenticated) {
+    if (typeof window !== 'undefined') {
+      window.location.href = '/auth'
+    }
+    return null
+  }
+
   return (
     <AppLayout>
       <div className="max-w-5xl leading-3">
@@ -49,13 +55,44 @@ export default function DashboardPage() {
           <p className="text-muted-foreground text-sm mt-1">Your study schedule for the week ahead</p>
         </div>
 
-        {mockUpcomingSessions.length > 0 ? (
+        {/* Loading State */}
+        {loading && (
+          <div className="text-center py-20">
+            <p className="text-muted-foreground text-sm">Loading your sessions...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="text-center py-20">
+            <p className="text-red-500 text-sm">{error}</p>
+          </div>
+        )}
+
+        {/* Sessions List */}
+        {!loading && !error && upcomingSessions.length > 0 && (
           <div className="space-y-59">
-            {mockUpcomingSessions.map((session) => (
-              <StudySessionCard key={session.id} session={session} />
+            {upcomingSessions.map((session) => (
+              <StudySessionCard
+                key={session.id}
+                session={{
+                  id: session.id,
+                  courseCode: session.course_code,
+                  title: session.title,
+                  date: session.date,
+                  time: session.time,
+                  location: session.location,
+                  attendees: session.attendees_count,
+                  hostName: session.host_name,
+                  groupName: session.group_name || "No Group",
+                }}
+              />
             ))}
           </div>
-        ) : (
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && upcomingSessions.length === 0 && (
           <div className="text-center py-20 glass rounded-lg p-12 border border-border">
             <div className="flex justify-center mb-5">
               <div className="p-4 rounded-full bg-primary/10">

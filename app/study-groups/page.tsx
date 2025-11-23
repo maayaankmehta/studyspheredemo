@@ -1,90 +1,47 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Search, Plus, BookOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import StudyGroupCard from "@/components/study-group-card"
 import AppLayout from "@/components/app-layout"
 import CreateStudyGroupDialog from "@/components/create-study-group-dialog"
-
-const mockStudyGroups = [
-  {
-    id: "1",
-    name: "Team StudySphere",
-    subject: "22CS3AEFWD",
-    description: "Deep dive into React JS, FASTAPI and Django.",
-    members: 24,
-    createdBy: "RazanCodes",
-    memberImages: [
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Sam",
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Jordan",
-    ],
-  },
-  {
-    id: "2",
-    name: "Statistics and Discrete Maths",
-    subject: "23MA3BSSDM",
-    description: "Collaborative learning space for probability and stats concepts, problem-solving, and exam prep.",
-    members: 18,
-    createdBy: "Talib Khan",
-    memberImages: [
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Sam",
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Emma",
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus",
-    ],
-  },
-  {
-    id: "3",
-    name: "Java Coding Club",
-    subject: "23CS3PCOOJ",
-    description: "Led by Faculty Monisha H M for learining developing Java Applications",
-    members: 32,
-    createdBy: "Monisha H M",
-    memberImages: [
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Jordan",
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Sofia",
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
-    ],
-  },
-  {
-    id: "4",
-    name: "Data Structures",
-    subject: "23CS3PCDST",
-    description: "Explore Data Structures, and How they work together.",
-    members: 15,
-    createdBy: "Muzammil Zahoor",
-    memberImages: [
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Emma",
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus",
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Sam",
-    ],
-  },
-  {
-    id: "5",
-    name: "Machine Learning gang",
-    subject: "23CS6PCMAL",
-    description: "Advanced machine learning techniques, neural networks, and AI project discussions.",
-    members: 28,
-    createdBy: "Mayank",
-    memberImages: [
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus",
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Sofia",
-      "https://api.dicebear.com/7.x/avataaars/svg?seed=Emma",
-    ],
-  },
-]
+import { groupsAPI } from "@/lib/api"
 
 export default function StudyGroupsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [groups, setGroups] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const filteredGroups = mockStudyGroups.filter(
+  // Fetch groups from API
+  useEffect(() => {
+    const fetchGroups = async () => {
+      try {
+        setLoading(true)
+        const data = await groupsAPI.getAll()
+        // Handle both array and paginated response formats
+        const groupsArray = Array.isArray(data) ? data : (data.results || [])
+        setGroups(groupsArray)
+        setError(null)
+      } catch (err: any) {
+        console.error("Failed to fetch groups:", err)
+        setError("Failed to load groups. Please try again.")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchGroups()
+  }, [])
+
+  const filteredGroups = groups.filter(
     (group) =>
-      group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      group.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      group.description.toLowerCase().includes(searchQuery.toLowerCase()),
+      group.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      group.subject?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      group.description?.toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
   return (
@@ -114,14 +71,41 @@ export default function StudyGroupsPage() {
           </div>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="text-center py-20">
+            <p className="text-muted-foreground text-sm">Loading groups...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="text-center py-20">
+            <p className="text-red-500 text-sm">{error}</p>
+          </div>
+        )}
+
         {/* Groups List */}
-        {filteredGroups.length > 0 ? (
+        {!loading && !error && filteredGroups.length > 0 && (
           <div className="space-y-10">
             {filteredGroups.map((group) => (
-              <StudyGroupCard key={group.id} group={group} />
+              <StudyGroupCard
+                key={group.id}
+                group={{
+                  id: group.id,
+                  name: group.name,
+                  subject: group.subject,
+                  description: group.description,
+                  members: group.members_count,
+                  createdBy: group.creator_name,
+                  memberImages: group.member_images || [],
+                }}
+              />
             ))}
           </div>
-        ) : (
+        )}
+
+        {!loading && !error && filteredGroups.length === 0 && (
           <div className="text-center py-20 glass rounded-lg p-12 border border-border">
             <div className="flex justify-center mb-5">
               <div className="p-4 rounded-full bg-primary/10">
@@ -137,7 +121,10 @@ export default function StudyGroupsPage() {
       </div>
 
       {/* Create Study Group Dialog */}
-      <CreateStudyGroupDialog open={isCreateOpen} onOpenChange={setIsCreateOpen} />
+      <CreateStudyGroupDialog
+        open={isCreateOpen}
+        onOpenChange={setIsCreateOpen}
+      />
     </AppLayout>
   )
 }
